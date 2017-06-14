@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+
+  <head>
+
+    <meta charset="UTF-8">
+    <title>I Choo Choo Choose you</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <!-- LINK TO FIREBASE GOES HERE -->
+
+    <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase.js"></script>
+
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <br>
+
+      <!-- Jumbotron -->
+      <div class="jumbotron">
+        <h1 class="text-center">I Choo Choo Choose you</h1>
+      </div>
+
+      <div class="row">
+
+
+        <!-- Wells for displaying all users -->
+        <div class="col-lg-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Current Train Schedule</h3>
+            </div>
+            <div class="panel-body">
+                <!--<div id="full-member-list"></div>-->
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Train Name</th>
+                      <th>Destination</th>
+                      <th>Frequency (min)</th>
+                      <th>Next Arrival</th>
+                      <th>Minutes Away</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td id="train-name"></td>
+                      <td id="destination"></td>
+                      <td id="frequency"></td>
+                      <td id="next"></td>
+                      <td id="min-left"></td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sign-Up Panel-->
+        <div class="col-lg-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Add Train</h3>
+            </div>
+
+            <div class="panel-body">
+
+              <!-- Sign-up Form (note the various input "types")-->
+              <form role="form">
+                <div class="form-group">
+                  <label for="name-input">Train Name:</label>
+                  <input class="form-control" id="name-input" type="text">
+                </div>
+                <div class="form-group">
+                  <label for="email-input">Destination:</label>
+                  <input class="form-control" id="email-input" type="text">
+                </div>
+                <div class="form-group">
+                  <label for="age-input">First Train Time (HH:mm - military time):</label>
+                  <input class="form-control" id="age-input" type="number">
+                </div>
+                <div class="form-group">
+                 <label for="comment-input">Frequency (min):</label>
+                 <input class="form-control" id="age-input" type="text"></textarea>
+                 </div>
+                <button class="btn btn-default" id="add-user" type="submit">Submit</button>
+              </form>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+
+    <!-- Script -->
+    <script>
+
+    // ========================================== START CODING BELOW!!
+
+
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCcc66_z43kjmpeTsb22IuehM8Jr6ukoKM",
+    authDomain: "train-schedule-7c2c0.firebaseapp.com",
+    databaseURL: "https://train-schedule-7c2c0.firebaseio.com",
+    storageBucket: "train-schedule-7c2c0.appspot.com",
+    messagingSenderId: "886857417701"
+  };
+  firebase.initializeApp(config);
+
+
+    var dataRef = firebase.database();
+
+    // Initial Values
+    var trainName = "";
+    var destination = "";
+    //var firstTrain = 0;
+    var frequency = "";
+
+    // Capture Button Click
+    $("#add-user").on("click", function(event) {
+      event.preventDefault();
+
+      // YOUR TASK!!!
+      // Code in the logic for storing and retrieving the most recent user.
+      // Don't forget to provide initial data to your Firebase database.
+      trainName = $("#train-name").val().trim();
+      destination = $("#destination").val().trim();
+      //firstTrain = $("#frequency").val().trim();
+      frequency = $("#comment-input").val().trim();
+
+      // Code for the push
+      dataRef.ref().push({
+
+        trainName: trainName,
+        destination: destination,
+        frequency: frequency,
+        //comment: comment,
+        //dateAdded: firebase.database.ServerValue.TIMESTAMP
+      });
+    });
+
+    // Firebase watcher + initial loader HINT: This code behaves similarly to .on("value")
+    dataRef.ref().on("child_added", function(childSnapshot) {
+
+      // Log everything that's coming out of snapshot
+      console.log(childSnapshot.val().trainName);
+      console.log(childSnapshot.val().destination);
+      console.log(childSnapshot.val().frequency);
+      
+      // full list of items to the well
+      $("#full-member-list").append("<div class='well'><span id='name'> " + childSnapshot.val().name +
+        " </span><span id='email'> " + childSnapshot.val().email +
+        " </span><span id='age'> " + childSnapshot.val().age +
+        " </span><span id='comment'> " + childSnapshot.val().comment + " </span></div>");
+
+    $("#train-name").html(childSnapshot.val().trainName);
+    // Handle the errors
+    }, function(errorObject) {
+      console.log("Errors handled: " + errorObject.code);
+    });
+
+    dataRef.ref().orderByChild("dateAdded").limitToLast(1).on("child_added", function(snapshot) {
+
+      console.log("limited:", snapshot.val());
+
+      // Change the HTML to reflect
+      $("#train-name").html(snapshot.val().trainName);
+      $("#email-display").html(snapshot.val().email);
+      $("#age-display").html(snapshot.val().age);
+      $("#comment-display").html(snapshot.val().comment);
+    });
+
+    </script>
+
+  </body>
+
+</html>
+
